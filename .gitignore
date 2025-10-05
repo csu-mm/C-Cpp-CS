@@ -53,3 +53,9 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# other, etc
+*.sdf
+*.vcxproj.user
+.vs/
+Debug/
