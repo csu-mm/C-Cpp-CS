@@ -2,8 +2,6 @@
 #include <list>
 using namespace std;
 
-// max heap:  https://www.youtube.com/watch?v=B7hVxCmfPtM&t=750s
-// https://www.youtube.com/watch?v=HqPJF2L5h9U
 // max/min heap : insert O is O(logn), delete O(logn) // that's why we need max/min heap to construct Priority Queue
 
 // representation of binary tree using array:
