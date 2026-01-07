@@ -57,6 +57,265 @@ void AddNode2Tree(tnode** pRootNode, int value)
 		AddNode2Tree(&(*pRootNode)->right, value);
 }
 
+list<int> discovered;
+list<list<int>> allPaths;
+void ShowAllPaths(struct tnode* root)
+{
+	if (!root) return;
+
+	list<int>::iterator it;
+	discovered.push_back(root->data);
+
+	ShowAllPaths(root->left);
+
+	if (root->left == NULL && root->right == NULL)
+	{
+		list<int> currentPath;
+		it = discovered.begin();
+		while (it != discovered.end())
+		{			
+			currentPath.push_back(*it);
+			it++;
+		}
+		allPaths.push_back(currentPath);
+		it--;
+		discovered.remove(*it);
+		return;
+	}
+
+	ShowAllPaths(root->right);
+	it = discovered.end(); it--;
+	discovered.remove(*it);
+}
+
+map<int, list<int>> mapLevelNodeData2;
+map<int, list<int>> CreateLevelNodeValuesCollection2(tnode* root, int level)
+{
+	if (!root) return mapLevelNodeData2;
+
+	map<int, list<int>>::iterator itMap;
+	itMap = mapLevelNodeData2.find(level);
+	if (itMap == mapLevelNodeData2.end())
+	{
+		mapLevelNodeData2.insert(pair<int, list<int>>(level, { root->data }));
+	}
+	else
+	{
+		itMap->second.push_back(root->data);
+	}
+
+	level++;
+	CreateLevelNodeValuesCollection2(root->left, level);
+	CreateLevelNodeValuesCollection2(root->right, level);
+
+	return mapLevelNodeData2;
+}
+
+int CompareTwoBinaryTrees(struct tnode* a, struct tnode* b)
+{
+	// returns :  0 if equal, otherwise 1
+	if (!a && !b) return 0;
+	if (!a || !b) return 1;
+
+	return (
+		   a->data == b->data
+		&& CompareTwoBinaryTrees(a->left, b->left) == 0
+		&& CompareTwoBinaryTrees(a->right, b->right) == 0
+		);
+}
+
+void ReverseWordsInString(char* str)
+{
+	if (!str) return;
+
+	int wlen;
+	char ch1;
+	int i;
+
+	while (*str)
+	{
+		while (*str == ' ') str++;
+		wlen = -1;
+		while (str[++wlen] && str[wlen] != ' ');
+		i = -1;
+		while (++i < wlen / 2)
+		{
+			ch1 = str[i];
+			str[i] = str[wlen - 1 - i];
+			str[wlen - 1 - i] = ch1;
+		}
+		if (str[wlen] == '\0') return;
+		str += wlen;
+	}
+}
+
+void RemoveTokensInString(char* pCharSrc, char* pCharToken)
+{
+	if (!pCharSrc || !pCharToken || !*pCharSrc || !*pCharToken) return;
+	char* pCharBackup = pCharSrc;
+
+	int i, j;
+	while (*pCharSrc)
+	{
+		i = 0;
+		while (pCharSrc[i] && pCharToken[i] && pCharSrc[i] == pCharToken[i]) i++;
+		if (!pCharToken[i])
+		{
+			j = -1;
+			while (pCharSrc[i + ++j])
+				pCharSrc[j] = pCharSrc[i + j];
+			pCharSrc[j] = '\0';			
+		}
+		else
+		{
+			pCharSrc++;
+		}
+	}
+}
+
+void PrintAllCombination(char *pChar)
+{
+	if (!pChar) return;
+	printf("");
+	if (!*pChar) return;
+
+	int len = -1;
+	while(pChar[++len]);
+	int combinationCount = 1 << len;
+	printf("\n");
+	for (int i = 0; i < combinationCount; i++)
+	{
+		for (int j = 0; j < len; j++)
+		{
+			if ((1 << j)&i) printf("%c", pChar[j]);
+		}
+		printf("\n");
+	}
+}
+
+list<list<int>> GetItemIndexesForGroupCombination(int collectionItemCount, int groupItemCount)
+{
+	list<list<int>> groupItemsIndexes;
+	
+	if (collectionItemCount < 1) return groupItemsIndexes;
+
+	int allCombinationsCount = 1 << collectionItemCount;
+	//int groupsCount = factorial(itemsCount) / (factorial(groupItemCount) * factorial(itemsCount - groupItemCount));
+
+	for (int i = 0; i < allCombinationsCount; i++)
+	{
+		list<int> indexes;
+		for (int j = 0; j < collectionItemCount; j++)
+		{
+			if ((1 << j) & i)
+			{
+				indexes.push_back(j);
+			}
+		}
+		if (indexes.size() == groupItemCount)
+		{
+			groupItemsIndexes.push_back(indexes);
+		}
+	}
+
+	return groupItemsIndexes;
+}
+char* LongestSubStringWithNonRepeatingChar(char* str)
+{
+	if (!str || !*str) return str;
+	set<char> SetChar;
+	int startTemp = 0;
+	int startIndex = 0;
+	int endIndex = 0;
+
+	int i = -1;
+	while (str[++i])
+	{
+		if (SetChar.insert(str[i]).second == false) // repeating char found
+		{
+			if (i-1-startTemp > endIndex-startIndex)
+			{
+				startIndex = startTemp;
+				endIndex = i - 1;
+			}
+
+			// next start
+			startTemp = i;
+			SetChar.clear();
+			SetChar.insert(str[i]);
+		}
+	}
+
+	if (endIndex > startIndex)
+	{
+		char* ret = (char*)malloc(1+(endIndex-startIndex+1) * sizeof(char));
+		i = -1;
+		while (++i <= endIndex-startIndex)
+		{
+			ret[i] = str[startIndex+i];
+		}
+		ret[i] = '\0';
+		return ret;
+	}
+
+	return NULL;
+}
+class Date
+{
+	int month, day, year;
+public:
+	Date()
+	{
+		month = day = year = 0;
+	}
+	Date(int mo, int d, int yr)
+	{
+		month = mo; day = d; year = yr;
+	}
+
+	friend ostream& operator << (ostream& os, const Date& dt);
+
+	//friend istream& operator >> (istream& is, Date& dt);
+	friend void operator >> (istream& is, Date& dt);
+};
+
+//istream& operator >> (istream& is, Date& dt)
+void operator >> (istream& is, Date& dt)
+{
+	is >> dt.month >> dt.day >> dt.year;
+}
+
+ostream& operator << (ostream& os, const Date& dt)
+{
+	os << dt.month << "/" << dt.day << "/" << dt.year;
+	return os;
+}
+
+struct SListNode
+{
+	int data;
+	struct SListNode* next;
+};
+void ReverseSList(struct SListNode** head)
+{
+	if (!head || !*head || !((*head)->next)) return;
+
+	struct SListNode* Current = *head;
+	struct SListNode* Prev = NULL;
+	struct SListNode* Next = NULL;
+
+	while (Current)
+	{
+		Next = Current->next;
+		Current->next = Prev;
+		Prev = Current;
+		Current = Next;
+	}
+	*head = Prev;
+}
+
+
+
 #define MAX_LEN 100
 int heap[MAX_LEN];
 int len = 0;
