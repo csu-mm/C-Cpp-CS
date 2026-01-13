@@ -1,9 +1,8 @@
 #include <iostream>
 #include <list>
+#include <map>
 using namespace std;
 
-// max heap:  https://www.youtube.com/watch?v=B7hVxCmfPtM&t=750s
-// https://www.youtube.com/watch?v=HqPJF2L5h9U
 // max/min heap : insert O is O(logn), delete O(logn) // that's why we need max/min heap to construct Priority Queue
 
 // representation of binary tree using array:
@@ -36,28 +35,56 @@ struct tnode
 	struct tnode* left;
 	struct tnode* right;
 	int data;
+	//int height;
 };
 
-void AddNode2Tree(tnode** pRootNode, int value)
+// returns:
+// -1 : item not found
+// +ve : number of comparison happened till found
+int comparisonCount = 0;
+int SearchInBST(struct tnode* pCurrentRoot, int value)
 {
-	if (!pRootNode) return;  // invalid input
+	if (!pCurrentRoot) return -1; // edge case, not found
+		
+	comparisonCount++;
+	
+	return pCurrentRoot->data == value ? comparisonCount // found, return comparison count.
+		// otherwise search in childs
+		: pCurrentRoot->data < value ? SearchInBST(pCurrentRoot->right, value) 
+		: SearchInBST(pCurrentRoot->left, value);
+
+	return -1; // not found
+}
+
+void AddNodeToBST(tnode** pCurrentRoot, int value)
+{
+	if (!pCurrentRoot) return;  // invalid pCurrentRoot containing pointer
 
 	struct tnode* pNewNode = (struct tnode*)malloc(sizeof(struct tnode));
 	pNewNode->data = value;
+	// pNewNode->height = 1;
 	pNewNode->left = NULL;
 	pNewNode->right = NULL;
-
-	if (*pRootNode == NULL)
+	
+	if (*pCurrentRoot == NULL)
 	{
-		*pRootNode = pNewNode;
+		*pCurrentRoot = pNewNode;
 		return;
 	}
 
-	if ((*pRootNode)->data > value)
-		AddNode2Tree(&(*pRootNode)->left, value);
+	if ((*pCurrentRoot)->data == value)
+	{
+		// duplicate not allowed
+		free(pNewNode);
+		return;
+	}
+	
+	if ((*pCurrentRoot)->data > value)
+		AddNodeToBST(&(*pCurrentRoot)->left, value);
 	else
-		AddNode2Tree(&(*pRootNode)->right, value);
+		AddNodeToBST(&(*pCurrentRoot)->right, value);
 }
+
 
 #define MAX_LEN 100
 int heap[MAX_LEN];
@@ -157,9 +184,29 @@ void printHeap()
 
 
 struct Point { int x; int y; };
-struct gNode
+
+struct gNode2
 {
 	Point node;
+	int data;
+	list<gNode2> neighbours;
+};
+
+struct gEdge2
+{
+	int weight;
+	Point fromNode;
+	Point toNode;
+};
+
+struct graph2
+{
+	list<gNode2> gNodes;
+	list<gEdge2> gEdges;
+};
+
+struct gNode
+{	
 	int data;
 	list<gNode> neighbours;
 };
@@ -167,8 +214,8 @@ struct gNode
 struct gEdge
 {
 	int weight;
-	Point fromNode;
-	Point toNode;
+	struct gNode fromNode;
+	struct gNode toNode;
 };
 
 struct graph
@@ -176,6 +223,91 @@ struct graph
 	list<gNode> gNodes;
 	list<gEdge> gEdges;
 };
+
+void CreateLevelNodesCollection(gNode* currentStartNode, int level, map<int, list<int>>& mapLevelNodeData)
+{
+	if (currentStartNode != NULL)
+	{
+		auto itMap = mapLevelNodeData.find(level);
+		if (itMap == mapLevelNodeData.end())
+		{
+			mapLevelNodeData.insert(pair<int, list<int>>(level, { currentStartNode->data }));
+			level++;
+		}
+		else
+		{
+			itMap->second.push_back(currentStartNode->data);
+		}
+		
+		for (auto& neighbour : currentStartNode->neighbours)
+		{
+			CreateLevelNodesCollection(&neighbour, level, mapLevelNodeData);
+		}
+	}
+}
+
+//void CreateLevelNodesCollection(gNode* currentStartNode, int level, map<int, list<int>>& mapLevelNodeData)
+//{
+//	//static map<int, list<int>> mapLevelNodeData;
+//
+//	if (currentStartNode != NULL)
+//	{
+//		//map<int, list<int>>::iterator itMap;
+//		auto itMap = mapLevelNodeData.find(level);
+//		if (itMap == mapLevelNodeData.end())
+//		{
+//			mapLevelNodeData.insert(pair<int, list<int>>(level, { currentStartNode->data }));
+//		}
+//		else
+//		{
+//			itMap->second.push_back(currentStartNode->data);
+//		}
+//
+//		level++;
+//		for (auto& neighbour : currentStartNode->neighbours)
+//		{
+//			CreateLevelNodesCollection(&neighbour, level, mapLevelNodeData);
+//		}
+//	}
+//	// CreateLevelNodeValuesCollection(root->left, level);
+//	// CreateLevelNodeValuesCollection(root->right, level);
+//
+//	// return mapLevelNodeData;
+//}
+// 
+//struct gNode 
+// {
+//	int data;
+//	std::vector<gNode*> neighbours;
+//};
+//
+//void CreateLevelNodesCollection(gNode* startNode, std::map<int, std::list<int>>& mapLevelNodeData) {
+//	if (!startNode) return;
+//
+//	std::queue<std::pair<gNode*, int>> q;
+//	std::unordered_set<gNode*> visited;
+//
+//	q.push({ startNode, 0 });
+//	visited.insert(startNode);
+//
+//	while (!q.empty()) 
+//  {
+//		auto [node, level] = q.front();
+//		q.pop();
+//
+//		mapLevelNodeData[level].push_back(node->data);
+//
+//		for (gNode* neighbor : node->neighbours) 
+//		{
+//			if (visited.find(neighbor) == visited.end()) 
+//			{
+//				q.push({ neighbor, level + 1 });
+//				visited.insert(neighbor);
+//			}
+//		}
+//	}
+//}
+
 
 void QuickSort1(int* a, int itemCount)
 {
@@ -204,7 +336,6 @@ void QuickSort1(int* a, int itemCount)
 	QuickSort1(a, j);
 	QuickSort1((a+j+1), itemCount-1-j);
 }
-
 
 struct dataItem
 {
@@ -242,6 +373,61 @@ void QuickSort(struct dataItem* a, int itemCount)
 void main()
 {
 	printf("\nApplication Started...\n\n");
+
+	printf("\nTest: Graph: ");
+	// Create Graph of few nodes 
+	struct graph g;
+	struct gNode n1,n2,n3,n4,n5,n6,n7,n8,n9,n10;
+	n1.data = 1; n2.data = 2; n3.data = 3; n4.data = 4; n5.data = 5;
+	n6.data = 6; n7.data = 7; n8.data = 8; n9.data = 9; n10.data = 10;
+	n1.neighbours.push_back(n2); n1.neighbours.push_back(n4); n1.neighbours.push_back(n5);
+	n3.neighbours.push_back(n6); 
+	n4.neighbours.push_back(n7); 
+	n5.neighbours.push_back(n3); n5.neighbours.push_back(n8);
+	n6.neighbours.push_back(n9);
+	n7.neighbours.push_back(n10);
+	n8.neighbours.push_back(n10);
+
+	// void CreateLevelNodesCollection(gNode* currentStartNode, int level, map<int, list<int>>& mapLevelNodeData)
+	map<int, list<int>> mapLevelNodeData;
+	CreateLevelNodesCollection(&n1, 0, mapLevelNodeData);
+	for (auto& kv : mapLevelNodeData)
+	{
+		printf("\n Level: %d => ", kv.first);
+		for (auto& v : kv.second)
+			printf("  %d  ", v);
+	}
+	//g.gNodes.push_back()
+
+	printf("\n\nApplication Closing..."); getchar(); return;
+
+	printf("\nTest: BST and AVL: ");
+	struct tnode* rootBST1 = NULL; struct tnode* rootBST2 = NULL;
+	//struct tnode* rootAVL = NULL;
+	AddNodeToBST(&rootBST1, 12); AddNodeToBST(&rootBST1, 8); AddNodeToBST(&rootBST1, 15); AddNodeToBST(&rootBST1, 25); 
+	AddNodeToBST(&rootBST1, 9);  AddNodeToBST(&rootBST1, 6); AddNodeToBST(&rootBST1, 14);
+	
+	AddNodeToBST(&rootBST2, 6); AddNodeToBST(&rootBST2, 8); AddNodeToBST(&rootBST2, 9);  AddNodeToBST(&rootBST2, 12);  
+	AddNodeToBST(&rootBST2, 14); AddNodeToBST(&rootBST2, 15); AddNodeToBST(&rootBST2, 25);	
+	// this will create BST only with 'right' child.
+
+	int searchVal = 25;
+	comparisonCount = 0;
+	printf("\nBST1 SeachItem value = %d, Comparison Count = %d", searchVal, SearchInBST(rootBST1, searchVal));
+	comparisonCount = 0;
+	printf("\nBST2 SeachItem value = %d, Comparison Count = %d", searchVal, SearchInBST(rootBST2, searchVal));
+
+	//printf("\nAVL SeachItem value = %d, Comparison Count = %d", searchVal, SearchInBST(rootAVL, searchVal));
+	printf("\n\nApplication Closing..."); getchar(); return;
+
+	//AddNodeToAVL(&rootAVL, 15);
+	//AddNodeToAVL(&rootAVL, 8);
+	//AddNodeToAVL(&rootAVL, 25);
+	//AddNodeToAVL(&rootAVL, 12);
+	//AddNodeToAVL(&rootAVL, 9);
+	//AddNodeToAVL(&rootAVL, 6);
+	//AddNodeToAVL(&rootAVL, 7);
+	//AddNodeToAVL(&rootAVL, 5);
 
 	printf("\nTest: Max-Heap: ");
 	addItem(20);
