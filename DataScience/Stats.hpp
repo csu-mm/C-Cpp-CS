@@ -38,6 +38,46 @@ vector<vector<double>> CreateDataFrame(int r, int c)
     return ret;
 }
 
+vector<vector<double>> matrixTranspose(vector<vector<double>> inputMatrix)
+{
+    vector<vector<double>> ret;
+    if(inputMatrix.size() < 1) return ret;
+    if(inputMatrix[0].size() < 1) return ret;
+
+    for(size_t col=0; col<inputMatrix[0].size(); col++)
+    {
+        vector<double> v1;
+        for(size_t row=0; row<inputMatrix.size(); row++)
+        {
+            v1.push_back(inputMatrix[row][col]);
+        }
+        ret.push_back(v1);
+    }
+
+    return ret;
+}
+vector<vector<double>> matrixMultiplication(vector<vector<double>> A, vector<vector<double>> B)
+{
+    vector<vector<double>> ret;
+    if(A.size() < 1 || B.size() < 1) return ret;
+    if(A[0].size() < 1 || B[0].size() < 1) return ret;
+    if(A[0].size() != B.size()) return ret;
+
+    for(size_t row=0; row<A.size(); row++)
+    {
+        vector<double> v1;
+        for(size_t col=0; col<B[0].size(); col++)
+        {
+            double sum = 0.0;
+            for(size_t k=0; k<A[0].size(); k++)
+                sum += A[row][k] * B[k][col];
+            v1.push_back(sum);
+        }
+        ret.push_back(v1);
+    }
+
+    return ret;
+}
 double GetFeatureStat(vector<vector<double>> inputDF, int IndexColumn, int featureColumnIndex, double (*function_name)(vector<double>))
 {
     //double InvalidOrErrorResult = -99.99;
@@ -75,7 +115,6 @@ double GetPercentageChange(double first, double last)
     return (double)(100.00 * (last-first)/(first));
 }
 
-//double GetAverage(const vector<double>& values)
 double GetAverage(vector<double> values)
 {
     if(values.size() < 1) return Invalid_Or_Error_Return_Value;
@@ -130,7 +169,6 @@ double GetMedian(vector<double> values)
     else return (values[ss/2] + values[ss/2 - 1]) / 2.0;    
 }
 
-//double GetStandardDeviation(const std::vector<double>& v) 
 double GetStandardDeviation(vector<double> values) 
 { 
     if (values.empty()) return 0.0; 

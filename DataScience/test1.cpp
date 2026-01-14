@@ -51,6 +51,50 @@ int main()
     cout << "\nGetFeatureStat(Sum)..Column index: " << featureColIndex << "): " << GetFeatureStat(dataFrame3x4, 0, featureColIndex, GetSum) << endl;
     cout << "\nGetFeatureStat(Standard Deviation)..Column index: " << featureColIndex << "): " << GetFeatureStat(dataFrame3x4, 0, featureColIndex, GetStandardDeviation) << endl;
 
+    cout << "\nTest: Matrix Transpose:\n";
+    vector<vector<double>> inputMatrix = CreateDataFrame(3, 4);
+    vector<vector<double>> transposedMatrix = matrixTranspose(inputMatrix);
+    cout << "\nInput Matrix:\n";
+    for (size_t row = 0; row < inputMatrix.size(); row++)
+    {
+        for(size_t col = 0; col < inputMatrix[row].size(); col++)
+        {
+            if(col == 0) cout << "{ ";
+            cout << inputMatrix[row][col];
+            if(col < inputMatrix[row].size() -1) cout << ", ";
+            else cout << " }";
+        }
+        cout << "\n";
+    }
+    cout << "\nTransposed Matrix:\n";
+    for (size_t row = 0; row < transposedMatrix.size(); row++)
+    {
+        for(size_t col = 0; col < transposedMatrix[row].size(); col++)
+        {
+            if(col == 0) cout << "{ ";
+            cout << transposedMatrix[row][col];
+            if(col < transposedMatrix[row].size() -1) cout << ", ";
+            else cout << " }";
+        }
+        cout << "\n";
+    }
+
+    cout << "\nTest: Matrix Multiplication:\n";    
+    vector<vector<double>> matrixC = matrixMultiplication(inputMatrix, transposedMatrix);
+    
+    cout << "\nMatrix C (A * T of A):\n";
+    for (size_t row = 0; row < matrixC.size(); row++)
+    {
+        for(size_t col = 0; col < matrixC[row].size(); col++)
+        {
+            if(col == 0) cout << "{ ";
+            cout << matrixC[row][col];
+            if(col < matrixC[row].size() -1) cout << ", ";
+            else cout << " }";
+        }
+        cout << "\n";
+    }
+
     cout << "\nApplication closing. Press any key..." << endl; getchar();
 
     return 0;
@@ -58,5 +102,4 @@ int main()
 
 //user1@T3500-A:~/Projs/CCpp/test1$ g++ -std=c++23 Stats.cpp -o Stats.exe
 //user1@T3500-A:~/Projs/CCpp/test1$ ./Stats.exe
-// graphics: https://www.youtube.com/watch?v=7eeyZQPd-kk&list=PLpuSZdJt0dKW8Rk0OPca3TXvAxd7bwJwq
-//           https://www.youtube.com/watch?v=OlbtdOAWNf8&list=PLpuSZdJt0dKW8Rk0OPca3TXvAxd7bwJwq&index=2
+// PS C:\Projs\AI-ML\Cpp\DataScience> g++ -std=c++23 test1.cpp -o test1.exe -mconsole
