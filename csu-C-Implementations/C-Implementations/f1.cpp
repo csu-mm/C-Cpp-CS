@@ -85,8 +85,7 @@ void AddNodeToBST(tnode** pCurrentRoot, int value)
 		AddNodeToBST(&(*pCurrentRoot)->right, value);
 }
 
-<<<<<<< HEAD
-=======
+// <<<<<<< HEAD  =======
 list<int> discovered;
 list<list<int>> allPaths;
 void ShowAllPaths(struct tnode* root)
@@ -344,8 +343,7 @@ void ReverseSList(struct SListNode** head)
 	*head = Prev;
 }
 
-
->>>>>>> 2f658db65d9321f6b2090d90c4fadabd3eb288a4
+//>>>>>>> 2f658db65d9321f6b2090d90c4fadabd3eb288a4
 
 #define MAX_LEN 100
 int heap[MAX_LEN];
