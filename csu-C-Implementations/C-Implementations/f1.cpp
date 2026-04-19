@@ -1,6 +1,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <set>
 using namespace std;
 
 // max/min heap : insert O is O(logn), delete O(logn) // that's why we need max/min heap to construct Priority Queue
@@ -25,7 +26,7 @@ int BinarySearch(int* arr, int low, int high, int searchItem)
 	int mid = low + (high - low) / 2 ;
         
 	return *(arr + mid) == searchItem ? mid :    // found
-			// not found here. so, apply divide and conquer strategy
+			// not found here. so, divide and then search in each part
 			*(arr+mid) > searchItem ? BinarySearch(arr, low, mid-1, searchItem)   // Search left half
                                     : BinarySearch(arr, mid+1, high, searchItem); // Search right half
 }
@@ -289,6 +290,57 @@ char* LongestSubStringWithNonRepeatingChar(char* str)
 
 	return NULL;
 }
+
+int getIterationNumberOfGeneration(const char* str)
+{
+	if (!str || !*str) return -1;
+	std::cout << "\ninput sequence:\t\t" << str << ". Length = " << strlen(str) << endl;
+	int len = -1;
+	while (str[++len] && (str[len] == '0' || str[len] == '1' || str[len] == '2'));
+	if (len < 1 || str[len] != '\0') return -1;
+	if (len == 1 && str[0] != '0') return -1;  // invalid digit for the sequence
+	if (len % 2 != 0) return -1; // invalid number of digits
+
+	int it = -1;
+	while (len > pow(2, ++it));
+	if (len != pow(2, it)) return -1;  // invalid generation
+
+	// Create the sequence string
+	char seq[1024];
+	int usedCharCount = 0;
+	while (usedCharCount < len)
+	{
+		if (usedCharCount == 0)
+		{
+			seq[0] = '0';
+			usedCharCount++;
+		}
+		else if (usedCharCount == 1)
+		{
+			seq[1] = '1';
+			usedCharCount++;
+		}
+		else // if (usedCharCount > 1)
+		{
+			int i = -1;
+			while (++i < usedCharCount)
+			{
+				if (seq[i] == '0')
+					seq[i + usedCharCount] = '1';
+				else if (seq[i] == '1')
+					seq[i + usedCharCount] = '2';
+				else
+					seq[i + usedCharCount] = '0';
+			}
+			usedCharCount *= 2;
+		}
+	}
+	seq[usedCharCount] = '\0';
+	std::cout << "App generated sequence: " << seq << endl;
+	return strcmp(str, seq) == 0 ? it : -1;
+}
+
+
 class Date
 {
 	int month, day, year;
